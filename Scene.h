@@ -8,6 +8,7 @@
 #include "Ray.h"
 #include "Shape.h"
 #include "Light.h"
+#include "Intersection.h"
 
 class Scene {
 public:
@@ -21,6 +22,11 @@ public:
     std::vector<std::shared_ptr<Shape>> objects; // List of objects in the scene
     std::vector<std::shared_ptr<Light>> lights; // List of lights in the scene
 
+    Vector3 globalAmbient = Vector3(0.2, 0.2, 0.2); // Global ambient light
+    float constantAttenuation = 1.0; // Constant attenuation factor
+    float linearAttenuation = 0.0;   // Linear attenuation factor
+    float quadraticAttenuation = 0.0; // Quadratic attenuation factor
+
     Scene(const Vector3& lookfrom, const Vector3& lookat, const Vector3& up, float fovy, int width, int height)
             : eyePosition(lookfrom), lookAt(lookat), up(up), fovy(fovy), width(width), height(height) {
         // Calculate w, u, v based on eyePosition, up vector, and center
@@ -29,7 +35,7 @@ public:
         Vector3 v = w.cross(u);
 
         // Calculate fovx based on fovy and the image aspect ratio
-        fovx = fovy * (float)width / (float)height;
+        fovx = 2 * atan(tan(fovy / 2) * (float)width / (float)height);
 
         // Calculate the corner points of the virtual screen
         float alpha = tan(fovx / 2);
@@ -43,6 +49,10 @@ public:
 
     void addObject(const std::shared_ptr<Shape>& object) {
         objects.push_back(object);
+    }
+
+    void addLight(const std::shared_ptr<Light>& light) {
+        lights.push_back(light);
     }
 
     Ray createRay(const Vector3& sample) const {
@@ -70,22 +80,39 @@ public:
     }
 
 
-    bool intersect(const Ray& ray, float& t) const {
-        bool hit = false;
+    Intersection intersect(const Ray& ray) const {
         float closestT = std::numeric_limits<float>::max();
+        Intersection closestIntersection;
 
         for (const auto& object : objects) {
             float currentT;
             if (object->intersect(ray, currentT) && currentT < closestT) {
-                std::cout << "Intersecting with object" << std::endl;
+                Vector3 point = ray.origin + ray.direction * currentT;
+                Vector3 normal = object->normalAt(point);
+                closestIntersection = Intersection(point, normal, object->material);
                 closestT = currentT;
-                hit = true;
             }
         }
 
-        t = closestT;
-        return hit;
+        return closestIntersection;
     }
+
+    bool isShadowed(const Ray& shadowRay, const std::shared_ptr<Light>& light) const {
+        float distanceToLight = (light->position - shadowRay.origin).length();
+        for (const auto& object : objects) {
+            float currentT;
+            if (object->intersect(shadowRay, currentT) && currentT < distanceToLight) {
+                return true; // There is an object between the point and the light
+            }
+        }
+        return false; // No objects are blocking the light
+    }
+
+    float attenuation(const Vector3& point, const std::shared_ptr<Light>& light) const {
+        float distance = (light->position - point).length();
+        return constantAttenuation / (constantAttenuation + linearAttenuation * distance + quadraticAttenuation * distance * distance);
+    }
+
 
 };
 

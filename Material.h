@@ -8,14 +8,14 @@
 
 class Material {
 public:
-    Vector3 ka; // Ambient
-    Vector3 kd; // Diffuse
-    Vector3 ks; // Specular
-    float sp;   // Specular exponent
-    Vector3 kr; // Reflection
+    Vector3 kd; // Diffuse reflectance
+    Vector3 ks; // Specular reflectance
+    float shininess; // Shininess
+    Vector3 emission; // Emission
 
-    Material(const Vector3& ka, const Vector3& kd, const Vector3& ks, float sp, const Vector3& kr)
-            : ka(ka), kd(kd), ks(ks), sp(sp), kr(kr) {}
+    Material() : kd(0, 0, 0), ks(0, 0, 0), shininess(0), emission(0, 0, 0) {}
+    Material(const Vector3& kd, const Vector3& ks, float shininess, const Vector3& emission)
+            : kd(kd), ks(ks), shininess(shininess), emission(emission) {}
 };
 
 

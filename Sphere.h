@@ -13,35 +13,21 @@ class Sphere : public Shape {
 public:
     Vector3 center;
     float radius;
-    Material material;
 
-    Sphere(const Vector3& center, float radius, const Material& material) : center(center), radius(radius), material(material) {}
+    Sphere(const Vector3& center, float radius, const Material& material)
+            : Shape(material), center(center), radius(radius) {}
 
     // Intersection method: checks if a ray intersects the sphere
     bool intersect(const Ray& ray, float& t) const override {
-        std::cout << "Ray origin x: " << ray.origin.x << std::endl;
-        std::cout << "Ray origin y: " << ray.origin.y << std::endl;
-        std::cout << "Ray origin z: " << ray.origin.z << std::endl;
-        std::cout << "Ray direction x: " << ray.direction.x << std::endl;
-        std::cout << "Ray direction y: " << ray.direction.y << std::endl;
-        std::cout << "Ray direction z: " << ray.direction.z << std::endl;
-        std::cout << "Intersecting with sphere" << std::endl;
         Vector3 oc = ray.origin - center;
         float a = ray.direction.dot(ray.direction);
         float b = 2.0f * oc.dot(ray.direction);
         float c = oc.dot(oc) - radius * radius;
         float discriminant = b * b - 4 * a * c;
 
-        std::cout << "a: " << a << std::endl;
-        std::cout << "b: " << b << std::endl;
-        std::cout << "c: " << c << std::endl;
-        std::cout << "Discriminant: " << discriminant << std::endl;
         if (discriminant >= 0) {
             float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
             float t2 = (-b + std::sqrt(discriminant)) / (2.0f * a);
-
-            std::cout << "t1: " << t1 << std::endl;
-            std::cout << "t2: " << t2 << std::endl;
 
             // If discriminant is zero, both roots are the same
             if (discriminant == 0) {
@@ -67,6 +53,11 @@ public:
         }
         return false;
     }
+
+    Vector3 normalAt(const Vector3& point) const override {
+        return (point - center).normalize(); // Normal at a point on a sphere
+    }
+
 };
 
 

@@ -53,23 +53,28 @@ void renderSphere() {
     Vector3 lookAt(0, 0, -1); // Center of the scene
     Vector3 up(0, 1, 0); // Up vector
     float fovy = 90; // Field of view in y direction
-    int width = 100;
-    int height = 100;
+    int width = 1000;
+    int height = 1000;
 
     // Create the Scene object
     Scene scene(eye, lookAt, up, fovy, width, height);
 
     Material material(
-            Vector3(0.1, 0.1, 0.1), // Ambient color (r, g, b)
             Vector3(1.0, 0.0, 0.0), // Diffuse color (r, g, b) - Red
-            Vector3(0.0, 0.0, 0.0), // Specular color (r, g, b) - No specular highlights
-            1.0,                   // Shininess - Low shininess
+            Vector3(1.0, 1.0, 1.0), // Specular color (r, g, b) - Shiny reflection
+            100.0,                 // Shininess - High shininess for a shiny surface
             Vector3(0.0, 0.0, 0.0)  // Emission color (r, g, b)
     );
 
     // Create a shared pointer to a sphere and add it to the scene
     std::shared_ptr<Shape> sphere = std::make_shared<Sphere>(Vector3(0, 0, -2), 1, material);
     scene.addObject(sphere);
+
+    // Create a point light and add it to the scene
+    Vector3 lightPosition(1, 1, 0); // Position of the light
+    Vector3 lightColor(1.0, 1.0, 1.0); // Color of the light (white)
+    std::shared_ptr<Light> pointLight = std::make_shared<Light>(Light::Type::Point, lightPosition, lightColor);
+    scene.addLight(pointLight);
 
     // Create a film object to store the rendered image
     Film film(width, height);
@@ -89,6 +94,8 @@ int main() {
     renderBSOD();
 
     renderSphere();
+
+
 
 
     return 0;

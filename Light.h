@@ -15,14 +15,11 @@ public:
 
     Vector3 direction; // Normalized direction of the light (for directional)
     Vector3 position;  // Position of the light (for point)
-    Vector3 intensity; // Color intensity
-    float constantAttenuation;
-    float linearAttenuation;
-    float quadraticAttenuation;
+    Vector3 color; // Color intensity
     Type type;
 
-    Light(Type type, const Vector3& directionOrPosition, const Vector3& intensity, float constant = 1.0f, float linear = 0.0f, float quadratic = 0.0f)
-            : direction(directionOrPosition), intensity(intensity), constantAttenuation(constant), linearAttenuation(linear), quadraticAttenuation(quadratic), type(type) {
+    Light(Type type, const Vector3& directionOrPosition, const Vector3& color)
+            : direction(directionOrPosition), color(color), type(type) {
         if (type == Type::Directional) {
             direction = directionOrPosition.normalize();
         } else {

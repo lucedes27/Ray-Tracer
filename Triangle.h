@@ -9,10 +9,9 @@
 class Triangle : public Shape {
 public:
     Vector3 vertex0, vertex1, vertex2; // Vertices of the triangle
-    Material material; // Material of the triangle
 
     Triangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Material& material)
-            : vertex0(v0), vertex1(v1), vertex2(v2), material(material) {}
+            : Shape(material), vertex0(v0), vertex1(v1), vertex2(v2) {}
 
     // Intersection method: checks if a ray intersects the triangle
     bool intersect(const Ray& ray, float& t) const override {

@@ -19,6 +19,27 @@ public:
     Vector3 operator*(float scalar) const { return Vector3(x * scalar, y * scalar, z * scalar); }
     friend Vector3 operator*(float scalar, const Vector3& v) { return Vector3(scalar * v.x, scalar * v.y, scalar * v.z); }
     Vector3 operator/(float scalar) const { return Vector3(x / scalar, y / scalar, z / scalar); }
+    Vector3 operator-() const { return Vector3(-x, -y, -z); }
+    Vector3& operator+=(const Vector3& v) {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+    bool operator==(const Vector3& v) const {
+        return x == v.x && y == v.y && z == v.z;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const Vector3& v) {
+        os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+        return os;
+    }
+    Vector3 operator*(const Vector3& v) const { return Vector3(x * v.x, y * v.y, z * v.z); }
+
+    void clamp() {
+        x = std::min(std::max(x, 0.0f), 1.0f);
+        y = std::min(std::max(y, 0.0f), 1.0f);
+        z = std::min(std::max(z, 0.0f), 1.0f);
+    }
 };
 
 
