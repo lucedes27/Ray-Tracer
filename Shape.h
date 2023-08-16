@@ -7,11 +7,17 @@
 
 #include "Material.h"
 
+enum class ShapeType {
+    Triangle,
+    Sphere
+};
+
 class Shape {
 public:
     Material material; // Material of the shape
+    ShapeType type;
 
-    Shape(const Material& material) : material(material) {}
+    Shape(const Material& material, ShapeType type) : material(material), type(type) {}
 
     virtual bool intersect(const Ray& ray, float& t) const = 0; // Pure virtual method
 

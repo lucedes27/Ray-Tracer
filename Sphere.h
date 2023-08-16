@@ -15,7 +15,7 @@ public:
     float radius;
 
     Sphere(const Vector3& center, float radius, const Material& material)
-            : Shape(material), center(center), radius(radius) {}
+            : Shape(material, ShapeType::Sphere), center(center), radius(radius) {}
 
     // Intersection method: checks if a ray intersects the sphere
     bool intersect(const Ray& ray, float& t) const override {
