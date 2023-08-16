@@ -100,7 +100,7 @@ public:
     bool isShadowed(const Ray& shadowRay, const std::shared_ptr<Light>& light) const {
         float distanceToLight = (light->position - shadowRay.origin).length();
         for (const auto& object : objects) {
-            float currentT;
+            float currentT = std::numeric_limits<float>::max();
             if (object->intersect(shadowRay, currentT) && currentT < distanceToLight) {
                 return true; // There is an object between the point and the light
             }

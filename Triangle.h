@@ -15,15 +15,14 @@ public:
 
     // Intersection method: checks if a ray intersects the triangle
     bool intersect(const Ray& ray, float& t) const override {
-        // Compute the plane's normal
-        Vector3 normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
+        // Compute the triangle's normal
+        Vector3 normal = (vertex2 - vertex0).cross(vertex1 - vertex0).normalize();
 
         // Compute denominator in t calculation
         float denominator = normal.dot(ray.direction);
         if (std::abs(denominator) < std::numeric_limits<float>::epsilon()) return false; // Ray is parallel to the plane
-
-        // Compute t value for the intersection point
-        t = (vertex0 - ray.origin).dot(normal) / denominator;
+        t = (vertex0.dot(normal) - ray.origin.dot(normal)) / denominator;
+        if (t < 0) return false;
 
         // Compute intersection point P
         Vector3 P = ray.origin + ray.direction * t;
@@ -46,6 +45,16 @@ public:
 
         return false;
     }
+
+    Vector3 normalAt(const Vector3& point) const override {
+        // For a flat triangle, the normal is the same across the entire surface.
+        // It's the cross product of two edges of the triangle.
+        Vector3 edge1 = vertex1 - vertex0;
+        Vector3 edge2 = vertex2 - vertex0;
+        Vector3 normal = edge1.cross(edge2).normalize();
+        return normal;
+    }
+
 
 };
 

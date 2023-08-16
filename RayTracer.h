@@ -60,7 +60,7 @@ private:
 
         for (const auto& light : scene.lights) {
             Vector3 toLight = (light->position - intersection.point).normalize();
-            Vector3 offset = toLight * 1e-4f; // Small offset towards the light
+            Vector3 offset = toLight * 1e-3f; // Small offset towards the light
             Ray shadowRay(intersection.point + offset, toLight); // Start the shadow ray slightly towards the light
 
             // Check for shadow
@@ -78,7 +78,7 @@ private:
         // Reflection
         if (depth < maxRecursionDepth) {
             Vector3 reflectionDirection = ray.direction - 2 * ray.direction.dot(intersection.normal) * intersection.normal;
-            Vector3 offset = reflectionDirection * 1e-4f; // Small offset in reflection direction
+            Vector3 offset = reflectionDirection * 1e-3f; // Small offset in reflection direction
             Ray reflectionRay(intersection.point + offset, reflectionDirection);
             Vector3 reflectionColor = findColor(reflectionRay, scene.intersect(reflectionRay), scene, depth + 1);
             color += intersection.material.ks * reflectionColor; // Add reflection contribution

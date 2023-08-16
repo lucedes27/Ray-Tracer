@@ -89,13 +89,60 @@ void renderSphere() {
     film.writeImage("sphere.png");
 }
 
+void renderTriangle() {
+    Vector3 eye(0, 0, 0);
+    Vector3 lookAt(0, 0, -1); // Center of the scene
+    Vector3 up(0, 1, 0); // Up vector
+    float fovy = 90; // Field of view in y direction
+    int width = 1000;
+    int height = 1000;
+
+    // Create the Scene object
+    Scene scene(eye, lookAt, up, fovy, width, height);
+
+    Material material(
+            Vector3(0.0, 1.0, 0.0), // Diffuse color (r, g, b) - Green
+            Vector3(0.5, 0.5, 0.5), // Specular color (r, g, b) - Shiny reflection
+            50.0,                 // Shininess - High shininess for a shiny surface
+            Vector3(0.0, 0.0, 0.0)  // Emission color (r, g, b)
+    );
+
+    // Define triangle vertices
+    Vector3 v0(-1, -1, -2);
+    Vector3 v1(1, -1, -2);
+    Vector3 v2(0, 1, -2);
+
+    // Create a shared pointer to a triangle and add it to the scene
+    std::shared_ptr<Shape> triangle = std::make_shared<Triangle>(v0, v1, v2, material);
+    scene.addObject(triangle);
+
+    // Create a point light and add it to the scene
+    Vector3 lightPosition(1, 1, 0); // Position of the light
+    Vector3 lightColor(1.0, 1.0, 1.0); // Color of the light (white)
+    std::shared_ptr<Light> pointLight = std::make_shared<Light>(Light::Type::Point, lightPosition, lightColor);
+    scene.addLight(pointLight);
+
+    // Create a film object to store the rendered image
+    Film film(width, height);
+
+    // Create a ray tracer object
+    RayTracer rayTracer;
+
+    // Render the scene using the ray tracer
+    rayTracer.trace(scene, film);
+
+    // Save the rendered image to a file
+    film.writeImage("triangle.png");
+}
+
+
 int main() {
 
     renderBSOD();
 
     renderSphere();
 
-
+    renderTriangle();
 
 
     return 0;
