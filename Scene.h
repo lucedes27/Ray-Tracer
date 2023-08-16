@@ -89,7 +89,7 @@ public:
             if (object->intersect(ray, currentT) && currentT < closestT) {
                 Vector3 point = ray.origin + ray.direction * currentT;
                 Vector3 normal = object->normalAt(point);
-                closestIntersection = Intersection(point, normal, object->material);
+                closestIntersection = Intersection(point, normal, object);
                 closestT = currentT;
             }
         }
