@@ -15,12 +15,14 @@ public:
 
     // Intersection method: checks if a ray intersects the triangle
     bool intersect(const Ray& ray, float& t) const override {
+        const float EPSILON = 1e-5f; // Custom epsilon value
+
         // Compute the triangle's normal
         Vector3 normal = (vertex2 - vertex0).cross(vertex1 - vertex0).normalize();
 
         // Compute denominator in t calculation
         float denominator = normal.dot(ray.direction);
-        if (std::abs(denominator) < std::numeric_limits<float>::epsilon()) return false; // Ray is parallel to the plane
+        if (std::abs(denominator) < EPSILON) return false; // Ray is parallel to the plane
         t = (vertex0.dot(normal) - ray.origin.dot(normal)) / denominator;
         if (t < 0) return false;
 
@@ -40,7 +42,7 @@ public:
         float alpha = 1.0f - beta - gamma;
 
         // Check if point is inside triangle
-        if (alpha >= 0 && beta >= 0 && gamma >= 0 && alpha + beta + gamma <= 1)
+        if (alpha > -EPSILON && beta > -EPSILON && gamma > -EPSILON && alpha + beta + gamma <= 1 + EPSILON)
             return true;
 
         return false;
