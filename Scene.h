@@ -118,6 +118,12 @@ public:
         globalAmbient = color;
     }
 
+    void setAttenuation(float constant, float linear, float quadratic) {
+        constantAttenuation = constant;
+        linearAttenuation = linear;
+        quadraticAttenuation = quadratic;
+    }
+
     void setMaxRecursionDepth(int depth) {
         maxRecursionDepth = depth;
     }
