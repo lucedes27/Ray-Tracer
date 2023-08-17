@@ -8,6 +8,7 @@
 #include "Shape.h"
 
 #include <cmath>
+#include <sstream>
 
 class Sphere : public Shape {
 public:
@@ -56,6 +57,12 @@ public:
 
     Vector3 normalAt(const Vector3& point) const override {
         return (point - center).normalize(); // Normal at a point on a sphere
+    }
+
+    std::string toString() const override {
+        std::ostringstream oss;
+        oss << "Sphere with center (" << center.x << ", " << center.y << ", " << center.z << ") and radius " << radius;
+        return oss.str();
     }
 
 };

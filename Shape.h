@@ -7,6 +7,8 @@
 
 #include "Material.h"
 
+#include <sstream>
+
 enum class ShapeType {
     Triangle,
     Sphere
@@ -22,6 +24,11 @@ public:
     virtual bool intersect(const Ray& ray, float& t) const = 0; // Pure virtual method
 
     virtual Vector3 normalAt(const Vector3& point) const = 0; // Pure virtual method to calculate the normal
+
+    virtual std::string toString() const {
+        return "Shape with material properties";
+    }
+
 
     virtual ~Shape() = default; // Virtual destructor
 };
