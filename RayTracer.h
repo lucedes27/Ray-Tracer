@@ -23,6 +23,8 @@ public:
         int pixelsProcessed = 0;
         int progressWidth = 50; // Width of the progress bar in characters
 
+        auto startTime = std::chrono::high_resolution_clock::now();  // Record start time
+
         for (int y = 0; y < scene.height; y++) {
             for (int x = 0; x < scene.width; x++) {
                 Vector3 sample = sampler.getSample(x, y);
@@ -34,6 +36,12 @@ public:
                 // Update progress bar
                 pixelsProcessed++;
                 int progress = (pixelsProcessed * progressWidth) / totalPixels;
+
+                auto currentTime = std::chrono::high_resolution_clock::now();
+                auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+                float timePerPixel = elapsedTime / static_cast<float>(pixelsProcessed);
+                float estimatedRemainingTime = timePerPixel * (totalPixels - pixelsProcessed);
+
                 std::cout << "\r[";
                 for (int i = 0; i < progressWidth; i++) {
                     if (i < progress) {
@@ -42,7 +50,7 @@ public:
                         std::cout << " ";
                     }
                 }
-                std::cout << "] " << (100 * pixelsProcessed) / totalPixels << "%";
+                std::cout << "] " << (100 * pixelsProcessed) / totalPixels << "%, Estimated time remaining: " << estimatedRemainingTime << "s";
                 std::cout.flush();
             }
         }
