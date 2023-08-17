@@ -5,6 +5,7 @@
 #ifndef RAY_TRACER_LIGHT_H
 #define RAY_TRACER_LIGHT_H
 
+#include <sstream>
 
 class Light {
 public:
@@ -26,6 +27,18 @@ public:
             position = directionOrPosition;
         }
     }
+
+    std::string toString() const {
+        std::ostringstream oss;
+        if (type == Type::Directional) {
+            oss << "Directional Light with direction (" << direction.x << ", " << direction.y << ", " << direction.z << ")";
+        } else {
+            oss << "Point Light with position (" << position.x << ", " << position.y << ", " << position.z << ")";
+        }
+        oss << " and color intensity (" << color.x << ", " << color.y << ", " << color.z << ")";
+        return oss.str();
+    }
+
 };
 
 
