@@ -27,6 +27,8 @@ public:
     float linearAttenuation = 0.0;   // Linear attenuation factor
     float quadraticAttenuation = 0.0; // Quadratic attenuation factor
 
+    Scene() = default;
+
     Scene(const Vector3& lookfrom, const Vector3& lookat, const Vector3& up, float fovy, int width, int height)
             : eyePosition(lookfrom), lookAt(lookat), up(up), fovy(fovy), width(width), height(height) {
         // Calculate w, u, v based on eyePosition, up vector, and center
@@ -34,8 +36,7 @@ public:
         Vector3 u = up.cross(w).normalize();
         Vector3 v = w.cross(u);
 
-        // Calculate fovx based on fovy and the image aspect ratio
-        fovx = 2 * atan(tan(fovy / 2) * (float)width / (float)height);
+        setFovX();
 
         // Calculate the corner points of the virtual screen
         float alpha = tan(fovx / 2);
@@ -113,6 +114,34 @@ public:
         return constantAttenuation / (constantAttenuation + linearAttenuation * distance + quadraticAttenuation * distance * distance);
     }
 
+    void setGlobalAmbient(const Vector3& color) {
+        globalAmbient = color;
+    }
+
+    void setMaxRecursionDepth(int depth) {
+        maxRecursionDepth = depth;
+    }
+
+    void setEyePosition(const Vector3& position) {
+        eyePosition = position;
+    }
+
+    void setLookAt(const Vector3& position) {
+        lookAt = position;
+    }
+
+    void setUp(const Vector3& vector) {
+        up = vector;
+    }
+
+    void setFov(float fov) {
+        fovy = fov;
+        setFovX();
+    }
+
+    void setFovX() {
+        fovx = 2 * atan(tan(fovy / 2) * (float)width / (float)height);
+    }
 
 };
 
