@@ -40,6 +40,11 @@ public:
         y = std::min(std::max(y, 0.0f), 1.0f);
         z = std::min(std::max(z, 0.0f), 1.0f);
     }
+
+    bool isBlack() const { // For debugging
+        return x == 0.0f && y == 0.0f && z == 0.0f;
+    }
+
 };
 
 
