@@ -32,7 +32,23 @@ public:
         }
         return result;
     }
-    
+
+    Vector3 operator*(const Vector3& vec) const {
+        float x = m[0][0] * vec.x + m[0][1] * vec.y + m[0][2] * vec.z + m[0][3];
+        float y = m[1][0] * vec.x + m[1][1] * vec.y + m[1][2] * vec.z + m[1][3];
+        float z = m[2][0] * vec.x + m[2][1] * vec.y + m[2][2] * vec.z + m[2][3];
+        float w = m[3][0] * vec.x + m[3][1] * vec.y + m[3][2] * vec.z + m[3][3];
+
+        // Convert back to 3D coordinates if w is not 1 (or close to 1 due to potential floating point inaccuracies)
+        if (w != 1.0f && w != 0.0f) {
+            x /= w;
+            y /= w;
+            z /= w;
+        }
+
+        return Vector3(x, y, z);
+    }
+
 };
 
 
