@@ -6,6 +6,7 @@
 #define RAY_TRACER_SHAPE_H
 
 #include "Material.h"
+#include "Transform.h"
 
 #include <sstream>
 
@@ -29,8 +30,22 @@ public:
         return "Shape with material properties";
     }
 
+    void setTransform(const Transform& t) {
+        transform = t;
+    }
+
+    const Transform& getTransform() const {
+        return transform;
+    }
+
+    Matrix4x4 getInverseTransform() const {
+        return transform.getCurrentTransform().inverse();
+    }
 
     virtual ~Shape() = default; // Virtual destructor
+
+protected:
+    Transform transform; // Transform of the shape
 };
 
 
