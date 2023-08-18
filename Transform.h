@@ -89,6 +89,10 @@ public:
     Matrix4x4 getCurrentTransform() const {
         return currentTransform;
     }
+
+    Matrix4x4 getInverseTransform() const {
+        return currentTransform.inverse();
+    }
 };
 
 
