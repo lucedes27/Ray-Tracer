@@ -181,6 +181,16 @@ public:
         return inv;
     }
 
+    Matrix4x4 transpose() const {
+        Matrix4x4 transposedMatrix;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                transposedMatrix.m[i][j] = m[j][i];
+            }
+        }
+        return transposedMatrix;
+    }
+
 };
 
 
