@@ -39,8 +39,8 @@ public:
         float z = m[2][0] * vec.x + m[2][1] * vec.y + m[2][2] * vec.z + m[2][3];
         float w = m[3][0] * vec.x + m[3][1] * vec.y + m[3][2] * vec.z + m[3][3];
 
-        // Convert back to 3D coordinates if w is not 1 (or close to 1 due to potential floating point inaccuracies)
-        if (w != 1.0f && w != 0.0f) {
+        const float epsilon = 1e-5f;  // Some small value
+        if (fabs(w - 1.0f) > epsilon && fabs(w) > epsilon) {
             x /= w;
             y /= w;
             z /= w;
