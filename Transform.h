@@ -77,12 +77,16 @@ public:
 
     void pushTransform() {
         transformStack.push(currentTransform);
+        currentTransform = Matrix4x4();  // Reset currentTransform to the identity matrix
     }
 
     void popTransform() {
         if (!transformStack.empty()) {
             currentTransform = transformStack.top();
             transformStack.pop();
+        } else {
+            // Handle error: Trying to pop from an empty stack
+            std::cerr << "Error: Transformation stack is empty. Cannot pop." << std::endl;
         }
     }
 
