@@ -41,6 +41,11 @@ public:
 
 };
 
-
+bool operator==(const Light& lhs, const Light& rhs) {
+    return lhs.type == rhs.type &&
+           lhs.direction == rhs.direction &&
+           lhs.position == rhs.position &&
+           lhs.color == rhs.color;
+}
 
 #endif //RAY_TRACER_LIGHT_H

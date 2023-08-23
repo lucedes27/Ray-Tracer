@@ -61,13 +61,22 @@ public:
 
     std::string toString() const override {
         std::ostringstream oss;
-        oss << "Sphere with center (" << center.x << ", " << center.y << ", " << center.z << ") and radius " << radius;
+        oss << Shape::toString() // Call base class's toString() method
+            << "Sphere with center (" << center.x << ", " << center.y << ", " << center.z << ") and radius " << radius;
         return oss.str();
     }
 
 };
 
+bool operator==(const Sphere& lhs, const Sphere& rhs) {
+    return static_cast<const Shape&>(lhs) == static_cast<const Shape&>(rhs) &&  // Compare Shape properties
+           lhs.center == rhs.center &&
+           lhs.radius == rhs.radius;
+}
 
-
+std::ostream& operator<<(std::ostream& os, const Sphere& sphere) {
+    os << sphere.toString();
+    return os;
+}
 
 #endif //RAY_TRACER_SPHERE_H

@@ -99,5 +99,8 @@ public:
     }
 };
 
+bool operator==(const Transform& lhs, const Transform& rhs) {
+    return lhs.getCurrentTransform() == rhs.getCurrentTransform();
+}
 
 #endif //RAY_TRACER_TRANSFORM_H

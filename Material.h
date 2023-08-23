@@ -35,6 +35,21 @@ public:
     }
 };
 
+bool operator==(const Material& lhs, const Material& rhs) {
+    return lhs.kd == rhs.kd &&
+           lhs.ks == rhs.ks &&
+           lhs.shininess == rhs.shininess &&
+           lhs.emission == rhs.emission;
+}
 
+std::ostream& operator<<(std::ostream& os, const Material& material) {
+    os << "Material { "
+       << "Diffuse: (" << material.kd.x << ", " << material.kd.y << ", " << material.kd.z << "), "
+       << "Specular: (" << material.ks.x << ", " << material.ks.y << ", " << material.ks.z << "), "
+       << "Shininess: " << material.shininess << ", "
+       << "Emission: (" << material.emission.x << ", " << material.emission.y << ", " << material.emission.z << ") "
+       << "}";
+    return os;
+}
 
 #endif //RAY_TRACER_MATERIAL_H

@@ -193,5 +193,15 @@ public:
 
 };
 
+bool operator==(const Matrix4x4& lhs, const Matrix4x4& rhs) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (lhs.m[i][j] != rhs.m[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 #endif //RAY_TRACER_MATRIX4X4_H

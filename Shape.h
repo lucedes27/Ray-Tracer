@@ -27,7 +27,9 @@ public:
     virtual Vector3 normalAt(const Vector3& point) const = 0; // Pure virtual method to calculate the normal
 
     virtual std::string toString() const {
-        return "Shape with material properties";
+        std::ostringstream oss;
+        oss << "Material properties: " << material << ", "; // Assuming you have overloaded the << operator for Material
+        return oss.str();
     }
 
     void setTransform(const Transform& t) {
@@ -44,10 +46,21 @@ public:
 
     virtual ~Shape() = default; // Virtual destructor
 
+    friend bool operator==(const Shape& lhs, const Shape& rhs);
+
 protected:
     Transform transform; // Transform of the shape
 };
 
+bool operator==(const Shape& lhs, const Shape& rhs) {
+    return lhs.material == rhs.material &&
+           lhs.type == rhs.type &&
+           lhs.transform == rhs.transform;
+}
 
+std::ostream& operator<<(std::ostream& os, const Shape& shape) {
+    os << shape.toString();
+    return os;
+}
 
 #endif //RAY_TRACER_SHAPE_H
