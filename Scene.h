@@ -149,53 +149,53 @@ public:
         fovx = 2 * atan(tan(fovy / 2) * (float)width / (float)height);
     }
 
-    bool operator==(const Scene& lhs, const Scene& rhs) {
-        // Compare basic attributes
-        if (lhs.eyePosition != rhs.eyePosition) return false;
-        if (lhs.lookAt != rhs.lookAt) return false;
-        if (lhs.up != rhs.up) return false;
-        if (lhs.fovy != rhs.fovy) return false;
-        if (lhs.fovx != rhs.fovx) return false;
-        if (lhs.width != rhs.width) return false;
-        if (lhs.height != rhs.height) return false;
-        if (lhs.globalAmbient != rhs.globalAmbient) return false;
-        if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
-        if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
-        if (lhs.quadraticAttenuation != rhs.quadraticAttenuation) return false;
-//        if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
-
-        // Compare objects in the scene
-        if (lhs.objects.size() != rhs.objects.size()) return false;
-        for (const auto& objL : lhs.objects) {
-            bool found = false;
-            for (const auto& objR : rhs.objects) {
-                if (*objL == *objR) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) return false;
-        }
-
-        // Compare lights in the scene
-        if (lhs.lights.size() != rhs.lights.size()) return false;
-        for (const auto& lightL : lhs.lights) {
-            bool found = false;
-            for (const auto& lightR : rhs.lights) {
-                if (*lightL == *lightR) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) return false;
-        }
-
-        return true;
-    }
-
     friend std::ostream& operator<<(std::ostream& os, const Scene& scene);
 
 };
+
+bool operator==(const Scene& lhs, const Scene& rhs) {
+    // Compare basic attributes
+    if (lhs.eyePosition != rhs.eyePosition) return false;
+    if (lhs.lookAt != rhs.lookAt) return false;
+    if (lhs.up != rhs.up) return false;
+    if (lhs.fovy != rhs.fovy) return false;
+    if (lhs.fovx != rhs.fovx) return false;
+    if (lhs.width != rhs.width) return false;
+    if (lhs.height != rhs.height) return false;
+    if (lhs.globalAmbient != rhs.globalAmbient) return false;
+    if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
+    if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
+    if (lhs.quadraticAttenuation != rhs.quadraticAttenuation) return false;
+//        if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
+
+    // Compare objects in the scene
+    if (lhs.objects.size() != rhs.objects.size()) return false;
+    for (const auto& objL : lhs.objects) {
+        bool found = false;
+        for (const auto& objR : rhs.objects) {
+            if (*objL == *objR) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) return false;
+    }
+
+    // Compare lights in the scene
+    if (lhs.lights.size() != rhs.lights.size()) return false;
+    for (const auto& lightL : lhs.lights) {
+        bool found = false;
+        for (const auto& lightR : rhs.lights) {
+            if (*lightL == *lightR) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) return false;
+    }
+
+    return true;
+}
 
 std::ostream& operator<<(std::ostream& os, const Scene& scene) {
     os << "Scene Details:" << std::endl;
