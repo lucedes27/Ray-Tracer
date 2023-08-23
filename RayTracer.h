@@ -25,6 +25,10 @@ public:
 
         auto startTime = std::chrono::high_resolution_clock::now();  // Record start time
 
+        if (scene.maxRecursionDepth > 0) {
+            maxRecursionDepth = scene.maxRecursionDepth;
+        }
+
         for (int y = 0; y < scene.height; y++) {
             for (int x = 0; x < scene.width; x++) {
                 Vector3 sample = sampler.getSample(x, y);
@@ -93,6 +97,7 @@ private:
         }
 
         color.clamp();
+//        std::cout << "Color: " << color << std::endl;
         return color;
     }
 

@@ -27,6 +27,8 @@ public:
     float linearAttenuation = 0.0;   // Linear attenuation factor
     float quadraticAttenuation = 0.0; // Quadratic attenuation factor
 
+    int maxRecursionDepth = 5;
+
     Scene() = default;
 
     Scene(const Vector3& lookfrom, const Vector3& lookat, const Vector3& up, float fovy, int width, int height)
@@ -77,6 +79,10 @@ public:
         Vector3 direction = origin + alpha * u + beta * v - w;
         direction.normalize();
 
+//        std::cout << "Width: " << width << ", Height: " << height << "\n";
+//        std::cout << "Sample: (" << sample.x << ", " << sample.y << ")\n";
+//        std::cout << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")\n";
+//        std::cout << "Direction: (" << direction.x << ", " << direction.y << ", " << direction.z << ")\n";
         return Ray(origin, direction);
     }
 
@@ -86,11 +92,19 @@ public:
         Intersection closestIntersection;
 
         for (const auto& object : objects) {
+            // Transform the ray into the object's local space
+            Ray localRay = ray.transformedBy(object->getInverseTransform());
+
             float currentT;
-            if (object->intersect(ray, currentT) && currentT < closestT) {
-                Vector3 point = ray.origin + ray.direction * currentT;
-                Vector3 normal = object->normalAt(point);
-                closestIntersection = Intersection(point, normal, object);
+            if (object->intersect(localRay, currentT) && currentT < closestT) {
+                Vector3 localPoint = localRay.origin + localRay.direction * currentT;
+                Vector3 localNormal = object->normalAt(localPoint);
+
+                // Transform the intersection point and normal back to world space
+                Vector3 worldPoint = object->getTransform().getCurrentTransform() * localPoint;
+                Vector3 worldNormal = object->getTransform().getInverseTransform().transpose() * localNormal;
+
+                closestIntersection = Intersection(worldPoint, worldNormal, object);
                 closestT = currentT;
             }
         }
@@ -139,9 +153,9 @@ public:
         quadraticAttenuation = quadratic;
     }
 
-//    void setMaxRecursionDepth(int depth) {
-//        maxRecursionDepth = depth;
-//    }
+    void setMaxRecursionDepth(int depth) {
+        maxRecursionDepth = depth;
+    }
 
     void setEyePosition(const Vector3& position) {
         eyePosition = position;
@@ -185,7 +199,7 @@ bool operator==(const Scene& lhs, const Scene& rhs) {
     if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
     if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
     if (lhs.quadraticAttenuation != rhs.quadraticAttenuation) return false;
-//        if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
+    if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
 
     // Compare objects in the scene
     if (lhs.objects.size() != rhs.objects.size()) return false;
@@ -225,7 +239,7 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
     os << "FOV X: " << scene.fovx << std::endl;
     os << "Width: " << scene.width << ", Height: " << scene.height << std::endl;
     os << "Global Ambient: " << scene.globalAmbient << std::endl;
-//    os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
+    os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
 
     // Attenuation details
     os << "Attenuation:" << std::endl;
