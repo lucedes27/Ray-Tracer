@@ -11,6 +11,7 @@ class Triangle : public Shape {
 public:
     Vector3 vertex0, vertex1, vertex2; // Vertices of the triangle
 
+    // Vertices should be specified in counter-clockwise order
     Triangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Material& material)
             : Shape(material, ShapeType::Triangle), vertex0(v0), vertex1(v1), vertex2(v2) {}
 
