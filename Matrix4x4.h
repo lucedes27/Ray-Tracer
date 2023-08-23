@@ -204,4 +204,15 @@ bool operator==(const Matrix4x4& lhs, const Matrix4x4& rhs) {
     return true;
 }
 
+std::ostream& operator<<(std::ostream& os, const Matrix4x4& matrix) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            os << matrix.m[i][j];
+            if (j != 3) os << ", ";
+        }
+        os << std::endl;
+    }
+    return os;
+}
+
 #endif //RAY_TRACER_MATRIX4X4_H
