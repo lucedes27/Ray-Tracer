@@ -61,8 +61,8 @@ public:
 
     std::string toString() const override {
         std::ostringstream oss;
-        oss << Shape::toString() // Call base class's toString() method
-            << "Sphere with center (" << center.x << ", " << center.y << ", " << center.z << ") and radius " << radius;
+        oss << "Sphere with center (" << center.x << ", " << center.y << ", " << center.z << ") and radius " << radius
+            << Shape::toString(); // Call base class's toString() method
         return oss.str();
     }
 

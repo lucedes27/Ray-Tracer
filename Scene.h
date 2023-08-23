@@ -232,6 +232,12 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
     os << "FOV Y: " << scene.fovy << std::endl;
     os << "FOV X: " << scene.fovx << std::endl;
     os << "Width: " << scene.width << ", Height: " << scene.height << std::endl;
+
+    os << "Top Left: " << scene.topLeft << std::endl;
+    os << "Top Right: " << scene.topRight << std::endl;
+    os << "Bottom Left: " << scene.bottomLeft << std::endl;
+    os << "Bottom Right: " << scene.bottomRight << std::endl;
+
     os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
 
     // Attenuation details
@@ -242,11 +248,11 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
 
     os << "Objects in Scene: " << scene.objects.size() << std::endl;
     for (const auto& object : scene.objects) {
-        os << "  - " << object->toString() << std::endl;
+        os << object->toString() << std::endl;
     }
     os << "Lights in Scene: " << scene.lights.size() << std::endl;
     for (const auto& light : scene.lights) {
-        os << "  - " << light->toString() << std::endl;
+        os << light->toString() << std::endl;
     }
     return os;
 }
