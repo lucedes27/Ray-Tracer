@@ -114,6 +114,21 @@ public:
         return constantAttenuation / (constantAttenuation + linearAttenuation * distance + quadraticAttenuation * distance * distance);
     }
 
+    void updateVirtualScreen() {
+        // Calculate w, u, v based on eyePosition, up vector, and center
+        Vector3 w = (eyePosition - lookAt).normalize();
+        Vector3 u = up.cross(w).normalize();
+        Vector3 v = w.cross(u);
+
+        // Calculate the corner points of the virtual screen
+        float alpha = tan(fovx / 2);
+        float beta = tan(fovy / 2);
+        topLeft = eyePosition + u * (-alpha) + v * beta - w;
+        topRight = eyePosition + u * alpha + v * beta - w;
+        bottomLeft = eyePosition + u * (-alpha) + v * (-beta) - w;
+        bottomRight = eyePosition + u * alpha + v * (-beta) - w;
+    }
+
     void setGlobalAmbient(const Vector3& color) {
         globalAmbient = color;
     }
@@ -162,6 +177,10 @@ bool operator==(const Scene& lhs, const Scene& rhs) {
     if (lhs.fovx != rhs.fovx) return false;
     if (lhs.width != rhs.width) return false;
     if (lhs.height != rhs.height) return false;
+    if (lhs.topLeft != rhs.topLeft) return false;
+    if (lhs.topRight != rhs.topRight) return false;
+    if (lhs.bottomLeft != rhs.bottomLeft) return false;
+    if (lhs.bottomRight != rhs.bottomRight) return false;
     if (lhs.globalAmbient != rhs.globalAmbient) return false;
     if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
     if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
