@@ -103,4 +103,9 @@ bool operator==(const Transform& lhs, const Transform& rhs) {
     return lhs.getCurrentTransform() == rhs.getCurrentTransform();
 }
 
+std::ostream& operator<<(std::ostream& os, const Transform& transform) {
+    os << "Transform Matrix: \n" << transform.getCurrentTransform(); // Assuming you have overloaded the << operator for Matrix4x4
+    return os;
+}
+
 #endif //RAY_TRACER_TRANSFORM_H

@@ -29,6 +29,7 @@ public:
     virtual std::string toString() const {
         std::ostringstream oss;
         oss << "Material properties: " << material << ", "; // Assuming you have overloaded the << operator for Material
+        oss << transform; // Print the transform
         return oss.str();
     }
 
