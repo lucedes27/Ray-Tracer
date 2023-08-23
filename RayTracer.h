@@ -68,7 +68,7 @@ private:
     Vector3 findColor(const Ray& ray, const Intersection& intersection, const Scene& scene, int depth = 0) {
         if (!intersection) return Vector3(0, 0, 0); // Return black if no intersection
 
-        Vector3 color = scene.globalAmbient + intersection.material.emission; // Global ambient and emission
+        Vector3 color = intersection.material.ambient + intersection.material.emission; // Global ambient and emission
 
         for (const auto& light : scene.lights) {
             Vector3 toLight = (light->position - intersection.point).normalize();

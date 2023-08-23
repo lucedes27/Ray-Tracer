@@ -122,7 +122,7 @@ public:
             } else if (command == "ambient") {
                 float r, g, b;
                 iss >> r >> g >> b;
-                scene.setGlobalAmbient(Vector3(r, g, b));
+                material.setAmbient(Vector3(r, g, b));
             } else if (command == "diffuse") {
                 float r, g, b;
                 iss >> r >> g >> b;

@@ -12,10 +12,11 @@ public:
     Vector3 ks; // Specular reflectance
     float shininess; // Shininess
     Vector3 emission; // Emission
+    Vector3 ambient; // Ambient
 
     Material() : kd(0, 0, 0), ks(0, 0, 0), shininess(0), emission(0, 0, 0) {}
-    Material(const Vector3& kd, const Vector3& ks, float shininess, const Vector3& emission)
-            : kd(kd), ks(ks), shininess(shininess), emission(emission) {}
+    Material(const Vector3& kd, const Vector3& ks, float shininess, const Vector3& emission, const Vector3& ambient = Vector3(0.2, 0.2, 0.2))
+            : kd(kd), ks(ks), shininess(shininess), emission(emission), ambient(ambient) {}
 
 
     void setDiffuse(const Vector3& kd) {
@@ -33,13 +34,18 @@ public:
     void setEmission(const Vector3& emission) {
         this->emission = emission;
     }
+
+    void setAmbient(const Vector3& ambient) {
+        this->ambient = ambient;
+    }
 };
 
 bool operator==(const Material& lhs, const Material& rhs) {
     return lhs.kd == rhs.kd &&
            lhs.ks == rhs.ks &&
            lhs.shininess == rhs.shininess &&
-           lhs.emission == rhs.emission;
+           lhs.emission == rhs.emission &&
+           lhs.ambient == rhs.ambient;
 }
 
 std::ostream& operator<<(std::ostream& os, const Material& material) {
@@ -48,6 +54,7 @@ std::ostream& operator<<(std::ostream& os, const Material& material) {
        << "Specular: (" << material.ks.x << ", " << material.ks.y << ", " << material.ks.z << "), "
        << "Shininess: " << material.shininess << ", "
        << "Emission: (" << material.emission.x << ", " << material.emission.y << ", " << material.emission.z << ") "
+       << "Ambient: (" << material.ambient.x << ", " << material.ambient.y << ", " << material.ambient.z << ") "
        << "}";
     return os;
 }

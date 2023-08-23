@@ -22,7 +22,6 @@ public:
     std::vector<std::shared_ptr<Shape>> objects; // List of objects in the scene
     std::vector<std::shared_ptr<Light>> lights; // List of lights in the scene
 
-    Vector3 globalAmbient = Vector3(0.2, 0.2, 0.2); // Global ambient light
     float constantAttenuation = 1.0; // Constant attenuation factor
     float linearAttenuation = 0.0;   // Linear attenuation factor
     float quadraticAttenuation = 0.0; // Quadratic attenuation factor
@@ -143,10 +142,6 @@ public:
         bottomRight = eyePosition + u * alpha + v * (-beta) - w;
     }
 
-    void setGlobalAmbient(const Vector3& color) {
-        globalAmbient = color;
-    }
-
     void setAttenuation(float constant, float linear, float quadratic) {
         constantAttenuation = constant;
         linearAttenuation = linear;
@@ -195,7 +190,6 @@ bool operator==(const Scene& lhs, const Scene& rhs) {
     if (lhs.topRight != rhs.topRight) return false;
     if (lhs.bottomLeft != rhs.bottomLeft) return false;
     if (lhs.bottomRight != rhs.bottomRight) return false;
-    if (lhs.globalAmbient != rhs.globalAmbient) return false;
     if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
     if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
     if (lhs.quadraticAttenuation != rhs.quadraticAttenuation) return false;
@@ -238,7 +232,6 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
     os << "FOV Y: " << scene.fovy << std::endl;
     os << "FOV X: " << scene.fovx << std::endl;
     os << "Width: " << scene.width << ", Height: " << scene.height << std::endl;
-    os << "Global Ambient: " << scene.globalAmbient << std::endl;
     os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
 
     // Attenuation details
