@@ -25,6 +25,13 @@ public:
     }
 };
 
+bool operator==(const Ray& lhs, const Ray& rhs) {
+    return lhs.origin == rhs.origin && lhs.direction == rhs.direction;
+}
 
+std::ostream& operator<<(std::ostream& os, const Ray& ray) {
+    os << "Ray(Origin: " << ray.origin << ", Direction: " << ray.direction << ")";
+    return os;
+}
 
 #endif //RAY_TRACER_RAY_H
