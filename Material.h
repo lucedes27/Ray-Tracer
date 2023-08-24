@@ -53,7 +53,7 @@ std::ostream& operator<<(std::ostream& os, const Material& material) {
        << "Diffuse: (" << material.kd.x << ", " << material.kd.y << ", " << material.kd.z << "), "
        << "Specular: (" << material.ks.x << ", " << material.ks.y << ", " << material.ks.z << "), "
        << "Shininess: " << material.shininess << ", "
-       << "Emission: (" << material.emission.x << ", " << material.emission.y << ", " << material.emission.z << ") "
+       << "Emission: (" << material.emission.x << ", " << material.emission.y << ", " << material.emission.z << "), "
        << "Ambient: (" << material.ambient.x << ", " << material.ambient.y << ", " << material.ambient.z << ") "
        << "}";
     return os;
