@@ -19,6 +19,7 @@ class Shape {
 public:
     Material material; // Material of the shape
     ShapeType type;
+    Matrix4x4 transform; // Transform of the shape
 
     Shape(const Material& material, ShapeType type) : material(material), type(type) {}
 
@@ -28,29 +29,30 @@ public:
 
     virtual std::string toString() const {
         std::ostringstream oss;
-        oss << "Material properties: " << material << ", "; // Assuming you have overloaded the << operator for Material
-        oss << transform; // Print the transform
+        oss << "- Material properties: " << material << ",\n";
+        oss << "- Transform Matrix:\n" << transform; // Print the transform
         return oss.str();
     }
 
-    void setTransform(const Transform& t) {
-        transform = t;
+    void setTransform(const Matrix4x4& t) {
+        // Only allow setTransform on Sphere objects
+        if (type == ShapeType::Sphere) {
+            transform = t;
+        }
     }
 
-    const Transform& getTransform() const {
+    const Matrix4x4& getTransform() const {
         return transform;
     }
 
     Matrix4x4 getInverseTransform() const {
-        return transform.getCurrentTransform().inverse();
+        return transform.inverse();
     }
 
     virtual ~Shape() = default; // Virtual destructor
 
     friend bool operator==(const Shape& lhs, const Shape& rhs);
 
-protected:
-    Transform transform; // Transform of the shape
 };
 
 bool operator==(const Shape& lhs, const Shape& rhs) {

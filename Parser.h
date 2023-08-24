@@ -77,8 +77,9 @@ public:
             } else if (command == "sphere") {
                 float x, y, z, radius;
                 iss >> x >> y >> z >> radius;
-                Vector3 transformedCenter = transform.getCurrentTransform() * Vector3(x, y, z);
-                scene.addObject(std::make_shared<Sphere>(transformedCenter, radius, material));
+                auto sphere = std::make_shared<Sphere>(Vector3(x, y, z), radius, material);
+                sphere->setTransform(transform.getCurrentTransform());
+                scene.addObject(sphere);
             } else if (command == "maxverts") {
                 int maxverts;
                 iss >> maxverts;
@@ -95,7 +96,9 @@ public:
                 Vector3 transformedV1 = transform.getCurrentTransform() * vertices[v1];
                 Vector3 transformedV2 = transform.getCurrentTransform() * vertices[v2];
                 Vector3 transformedV3 = transform.getCurrentTransform() * vertices[v3];
-                scene.addObject(std::make_shared<Triangle>(transformedV1, transformedV2, transformedV3, material));
+                auto triangle = std::make_shared<Triangle>(transformedV1, transformedV2, transformedV3, material);
+                triangle->setTransform(Matrix4x4());
+                scene.addObject(triangle);
             } else if (command == "translate") {
                 float x, y, z;
                 iss >> x >> y >> z;

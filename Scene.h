@@ -100,8 +100,8 @@ public:
                 Vector3 localNormal = object->normalAt(localPoint);
 
                 // Transform the intersection point and normal back to world space
-                Vector3 worldPoint = object->getTransform().getCurrentTransform() * localPoint;
-                Vector3 worldNormal = object->getTransform().getInverseTransform().transpose() * localNormal;
+                Vector3 worldPoint = object->transform * localPoint;
+                Vector3 worldNormal = object->transform.inverse().transpose() * localNormal;
 
                 closestIntersection = Intersection(worldPoint, worldNormal, object);
                 closestT = currentT;
