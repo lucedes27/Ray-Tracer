@@ -31,16 +31,18 @@ private:
     Transform transform;
     std::stack<Transform> transformStack;  // Stack to store transformations
 
-    Vector3* vertices;
     int vertexCount;
+    Vector3* vertices;
 public:
     Parser() : width(0), height(0), outputFilename(""), lookfromx(0), lookfromy(0), lookfromz(0), lookatx(0), lookaty(0),
                lookatz(0), upx(0), upy(0), upz(0), fov(0), constantAttenuation(1), linearAttenuation(0),
-               quadraticAttenuation(0), vertexCount(0) {}
+               quadraticAttenuation(0), vertexCount(0), vertices(nullptr) {}
 
 
     ~Parser() {
-        delete[] vertices;
+        if (vertices != nullptr) {
+            delete[] vertices;
+        }
     }
 
     Scene parseFile(const std::string& filename) {
