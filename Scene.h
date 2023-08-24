@@ -32,6 +32,12 @@ public:
 
     Scene(const Vector3& lookfrom, const Vector3& lookat, const Vector3& up, float fovy, int width, int height)
             : eyePosition(lookfrom), lookAt(lookat), up(up), fovy(fovy), width(width), height(height) {
+
+        Vector3 forward = (lookAt - eyePosition).normalize();
+        Vector3 right = (up.cross(forward)).normalize();
+        Vector3 actualUp = forward.cross(right);
+        this->up = actualUp;
+
         // Calculate w, u, v based on eyePosition, up vector, and center
         Vector3 w = (eyePosition - lookAt).normalize();
         Vector3 u = up.cross(w).normalize();
@@ -58,30 +64,14 @@ public:
     }
 
     Ray createRay(const Vector3& sample) const {
-        // Compute w, u, v based on eyePosition, up vector, and center
+        // Compute the point on the virtual screen
         Vector3 center = topLeft + (topRight - topLeft) * (sample.x / width) + (bottomLeft - topLeft) * (sample.y / height);
-        float i = sample.y;
-        float j = sample.x;
-
-        Vector3 a = eyePosition - center;
-        Vector3 b = up;
-        Vector3 w = a.normalize();
-        Vector3 u = b.cross(w).normalize();
-        Vector3 v = w.cross(u);
-
-        // Compute alpha and beta based on FOV angles and sample
-        float alpha = tan(fovx / 2) * (j - (width / 2)) / (width / 2);
-        float beta = tan(fovy / 2) * ((height / 2) - i) / (height / 2);
 
         // Compute the ray's origin and direction
         Vector3 origin = eyePosition;
-        Vector3 direction = origin + alpha * u + beta * v - w;
+        Vector3 direction = center - origin; // Direction from the eye to the point on the virtual screen
         direction.normalize();
 
-//        std::cout << "Width: " << width << ", Height: " << height << "\n";
-//        std::cout << "Sample: (" << sample.x << ", " << sample.y << ")\n";
-//        std::cout << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")\n";
-//        std::cout << "Direction: (" << direction.x << ", " << direction.y << ", " << direction.z << ")\n";
         return Ray(origin, direction);
     }
 
