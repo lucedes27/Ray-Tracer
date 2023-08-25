@@ -151,9 +151,10 @@ public:
             }
         }
 
-        std::cout << "Done parsing" << std::endl;
         scene.setFovX();
         scene.updateVirtualScreen();
+
+        std::cout << "Successfully parsed file " << filename << std::endl;
         return scene;
     }
 

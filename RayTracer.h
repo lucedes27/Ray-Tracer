@@ -97,7 +97,6 @@ private:
         }
 
         color.clamp();
-//        std::cout << "Color: " << color << std::endl;
         return color;
     }
 
