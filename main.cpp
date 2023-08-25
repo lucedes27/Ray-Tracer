@@ -734,7 +734,7 @@ int main() {
 //
 //     renderSphere();
 
-    renderSphereWithDirectional();
+//    renderSphereWithDirectional();
 //
 //     renderTriangle();
 //
@@ -770,7 +770,7 @@ int main() {
 
     std::cout << myScene << std::endl;
 
-    RayTracer rayTracer = RayTracer();
+    RayTracer rayTracer;
     rayTracer.trace(myScene, film);
 
     film.writeImage(parser.getOutputFilename());
