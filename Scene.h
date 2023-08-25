@@ -85,16 +85,21 @@ public:
             Ray localRay = ray.transformedBy(object->getInverseTransform());
 
             float currentT;
-            if (object->intersect(localRay, currentT) && currentT < closestT) {
+            if (object->intersect(localRay, currentT)) {
                 Vector3 localPoint = localRay.origin + localRay.direction * currentT;
                 Vector3 localNormal = object->normalAt(localPoint);
 
-                // Transform the intersection point and normal back to world space
+                // Transform the intersection point back to world space
                 Vector3 worldPoint = object->transform * localPoint;
                 Vector3 worldNormal = object->transform.inverse().transpose() * localNormal;
 
-                closestIntersection = Intersection(worldPoint, worldNormal, object);
-                closestT = currentT;
+                // Compute the distance t in world space
+                float worldT = (worldPoint - ray.origin).length();
+
+                if (worldT < closestT) {
+                    closestIntersection = Intersection(worldPoint, worldNormal, object);
+                    closestT = worldT;
+                }
             }
         }
 
