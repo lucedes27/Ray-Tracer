@@ -46,7 +46,10 @@ public:
     }
     // Comparison operators
     bool operator==(const Vector3& v) const {
-        return x == v.x && y == v.y && z == v.z;
+        const float epsilon = 1e-5f;
+        return std::fabs(x - v.x) < epsilon &&
+               std::fabs(y - v.y) < epsilon &&
+               std::fabs(z - v.z) < epsilon;
     }
     bool operator!=(const Vector3& v) const {
         return !(*this == v);

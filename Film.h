@@ -30,6 +30,7 @@ public:
             }
         }
         stbi_write_png(filename.c_str(), width, height, 3, image.data(), width * 3);
+        std::cout << "Image written to " << filename << std::endl;
     }
 };
 

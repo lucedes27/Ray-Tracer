@@ -61,10 +61,11 @@ public:
 
     std::string toString() const override {
         std::ostringstream oss;
-        oss << Shape::toString() // Call base class's toString() method
-            << "Triangle with vertices (" << vertex0.x << ", " << vertex0.y << ", " << vertex0.z << "), "
+        oss << "Triangle with vertices (" << vertex0.x << ", " << vertex0.y << ", " << vertex0.z << "), "
             << "(" << vertex1.x << ", " << vertex1.y << ", " << vertex1.z << "), and "
-            << "(" << vertex2.x << ", " << vertex2.y << ", " << vertex2.z << ")";
+            << "(" << vertex2.x << ", " << vertex2.y << ", " << vertex2.z << ")\n"
+            << Shape::toString(); // Call base class's toString() method
+
         return oss.str();
     }
 

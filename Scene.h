@@ -22,15 +22,22 @@ public:
     std::vector<std::shared_ptr<Shape>> objects; // List of objects in the scene
     std::vector<std::shared_ptr<Light>> lights; // List of lights in the scene
 
-    Vector3 globalAmbient = Vector3(0.2, 0.2, 0.2); // Global ambient light
     float constantAttenuation = 1.0; // Constant attenuation factor
     float linearAttenuation = 0.0;   // Linear attenuation factor
     float quadraticAttenuation = 0.0; // Quadratic attenuation factor
+
+    int maxRecursionDepth = 5;
 
     Scene() = default;
 
     Scene(const Vector3& lookfrom, const Vector3& lookat, const Vector3& up, float fovy, int width, int height)
             : eyePosition(lookfrom), lookAt(lookat), up(up), fovy(fovy), width(width), height(height) {
+
+        Vector3 forward = (lookAt - eyePosition).normalize();
+        Vector3 right = (up.cross(forward)).normalize();
+        Vector3 actualUp = forward.cross(right);
+        this->up = actualUp;
+
         // Calculate w, u, v based on eyePosition, up vector, and center
         Vector3 w = (eyePosition - lookAt).normalize();
         Vector3 u = up.cross(w).normalize();
@@ -57,24 +64,12 @@ public:
     }
 
     Ray createRay(const Vector3& sample) const {
-        // Compute w, u, v based on eyePosition, up vector, and center
+        // Compute the point on the virtual screen
         Vector3 center = topLeft + (topRight - topLeft) * (sample.x / width) + (bottomLeft - topLeft) * (sample.y / height);
-        float i = sample.y;
-        float j = sample.x;
-
-        Vector3 a = eyePosition - center;
-        Vector3 b = up;
-        Vector3 w = a.normalize();
-        Vector3 u = b.cross(w).normalize();
-        Vector3 v = w.cross(u);
-
-        // Compute alpha and beta based on FOV angles and sample
-        float alpha = tan(fovx / 2) * (j - (width / 2)) / (width / 2);
-        float beta = tan(fovy / 2) * ((height / 2) - i) / (height / 2);
 
         // Compute the ray's origin and direction
         Vector3 origin = eyePosition;
-        Vector3 direction = origin + alpha * u + beta * v - w;
+        Vector3 direction = center - origin; // Direction from the eye to the point on the virtual screen
         direction.normalize();
 
         return Ray(origin, direction);
@@ -86,12 +81,25 @@ public:
         Intersection closestIntersection;
 
         for (const auto& object : objects) {
+            // Transform the ray into the object's local space
+            Ray localRay = ray.transformedBy(object->getInverseTransform());
+
             float currentT;
-            if (object->intersect(ray, currentT) && currentT < closestT) {
-                Vector3 point = ray.origin + ray.direction * currentT;
-                Vector3 normal = object->normalAt(point);
-                closestIntersection = Intersection(point, normal, object);
-                closestT = currentT;
+            if (object->intersect(localRay, currentT)) {
+                Vector3 localPoint = localRay.origin + localRay.direction * currentT;
+                Vector3 localNormal = object->normalAt(localPoint);
+
+                // Transform the intersection point back to world space
+                Vector3 worldPoint = object->transform * localPoint;
+                Vector3 worldNormal = object->transform.inverse().transpose() * localNormal;
+
+                // Compute the distance t in world space
+                float worldT = (worldPoint - ray.origin).length();
+
+                if (worldT < closestT) {
+                    closestIntersection = Intersection(worldPoint, worldNormal, object);
+                    closestT = worldT;
+                }
             }
         }
 
@@ -129,19 +137,15 @@ public:
         bottomRight = eyePosition + u * alpha + v * (-beta) - w;
     }
 
-    void setGlobalAmbient(const Vector3& color) {
-        globalAmbient = color;
-    }
-
     void setAttenuation(float constant, float linear, float quadratic) {
         constantAttenuation = constant;
         linearAttenuation = linear;
         quadraticAttenuation = quadratic;
     }
 
-//    void setMaxRecursionDepth(int depth) {
-//        maxRecursionDepth = depth;
-//    }
+    void setMaxRecursionDepth(int depth) {
+        maxRecursionDepth = depth;
+    }
 
     void setEyePosition(const Vector3& position) {
         eyePosition = position;
@@ -181,11 +185,10 @@ bool operator==(const Scene& lhs, const Scene& rhs) {
     if (lhs.topRight != rhs.topRight) return false;
     if (lhs.bottomLeft != rhs.bottomLeft) return false;
     if (lhs.bottomRight != rhs.bottomRight) return false;
-    if (lhs.globalAmbient != rhs.globalAmbient) return false;
     if (lhs.constantAttenuation != rhs.constantAttenuation) return false;
     if (lhs.linearAttenuation != rhs.linearAttenuation) return false;
     if (lhs.quadraticAttenuation != rhs.quadraticAttenuation) return false;
-//        if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
+    if (lhs.maxRecursionDepth != rhs.maxRecursionDepth) return false;
 
     // Compare objects in the scene
     if (lhs.objects.size() != rhs.objects.size()) return false;
@@ -224,8 +227,13 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
     os << "FOV Y: " << scene.fovy << std::endl;
     os << "FOV X: " << scene.fovx << std::endl;
     os << "Width: " << scene.width << ", Height: " << scene.height << std::endl;
-    os << "Global Ambient: " << scene.globalAmbient << std::endl;
-//    os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
+
+    os << "Top Left: " << scene.topLeft << std::endl;
+    os << "Top Right: " << scene.topRight << std::endl;
+    os << "Bottom Left: " << scene.bottomLeft << std::endl;
+    os << "Bottom Right: " << scene.bottomRight << std::endl;
+
+    os << "Max Recursion Depth: " << scene.maxRecursionDepth << std::endl;
 
     // Attenuation details
     os << "Attenuation:" << std::endl;
@@ -235,11 +243,11 @@ std::ostream& operator<<(std::ostream& os, const Scene& scene) {
 
     os << "Objects in Scene: " << scene.objects.size() << std::endl;
     for (const auto& object : scene.objects) {
-        os << "  - " << object->toString() << std::endl;
+        os << object->toString() << std::endl;
     }
     os << "Lights in Scene: " << scene.lights.size() << std::endl;
     for (const auto& light : scene.lights) {
-        os << "  - " << light->toString() << std::endl;
+        os << light->toString() << std::endl;
     }
     return os;
 }

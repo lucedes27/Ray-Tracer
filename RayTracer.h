@@ -25,6 +25,10 @@ public:
 
         auto startTime = std::chrono::high_resolution_clock::now();  // Record start time
 
+        if (scene.maxRecursionDepth > 0) {
+            maxRecursionDepth = scene.maxRecursionDepth;
+        }
+
         for (int y = 0; y < scene.height; y++) {
             for (int x = 0; x < scene.width; x++) {
                 Vector3 sample = sampler.getSample(x, y);
@@ -64,7 +68,7 @@ private:
     Vector3 findColor(const Ray& ray, const Intersection& intersection, const Scene& scene, int depth = 0) {
         if (!intersection) return Vector3(0, 0, 0); // Return black if no intersection
 
-        Vector3 color = scene.globalAmbient + intersection.material.emission; // Global ambient and emission
+        Vector3 color = intersection.material.ambient + intersection.material.emission; // Global ambient and emission
 
         for (const auto& light : scene.lights) {
             Vector3 toLight = (light->position - intersection.point).normalize();
@@ -84,7 +88,7 @@ private:
         }
 
         // Reflection
-        if (depth < maxRecursionDepth) {
+        if (depth < maxRecursionDepth && !intersection.material.ks.isBlack()) {
             Vector3 reflectionDirection = ray.direction - 2 * ray.direction.dot(intersection.normal) * intersection.normal;
             Vector3 offset = reflectionDirection * 1e-3f; // Small offset in reflection direction
             Ray reflectionRay(intersection.point + offset, reflectionDirection);
