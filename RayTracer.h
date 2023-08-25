@@ -88,7 +88,7 @@ private:
         }
 
         // Reflection
-        if (depth < maxRecursionDepth) {
+        if (depth < maxRecursionDepth && !intersection.material.ks.isBlack()) {
             Vector3 reflectionDirection = ray.direction - 2 * ray.direction.dot(intersection.normal) * intersection.normal;
             Vector3 offset = reflectionDirection * 1e-3f; // Small offset in reflection direction
             Ray reflectionRay(intersection.point + offset, reflectionDirection);
