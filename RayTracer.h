@@ -98,13 +98,18 @@ private:
         Vector3 color = intersection.material.ambient + intersection.material.emission; // Global ambient and emission
 
         for (const auto& light : scene.lights) {
-            Vector3 toLight = (light->position - intersection.point).normalize();
+            Vector3 toLight;
+            if (light->type == Light::Type::Directional) {
+                toLight = -light->direction; // Directional light's direction is constant
+            } else {
+                toLight = (light->position - intersection.point).normalize(); // Point light's direction depends on position
+            }
             Vector3 offset = toLight * 1e-3f; // Small offset towards the light
             Ray shadowRay(intersection.point + offset, toLight); // Start the shadow ray slightly towards the light
 
             // Check for shadow
             if (!scene.isShadowed(shadowRay, light)) {
-                float attenuation = scene.attenuation(intersection.point, light);
+                float attenuation = (light->type == Light::Type::Point) ? scene.attenuation(intersection.point, light) : 1.0f; // Apply attenuation only for point lights
                 Vector3 diffuse = intersection.material.kd * std::max(0.0f, intersection.normal.dot(toLight));
                 Vector3 viewDirection = -ray.direction; // View direction is opposite to ray direction
                 Vector3 halfVector = (toLight + viewDirection).normalize(); // Half-vector
