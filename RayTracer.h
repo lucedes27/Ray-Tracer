@@ -6,6 +6,9 @@
 #define RAY_TRACER_RAYTRACER_H
 
 #include <algorithm>
+#include <thread>
+#include <vector>
+#include <mutex>
 
 #include "Film.h"
 #include "Scene.h"
@@ -15,13 +18,13 @@
 
 class RayTracer {
 public:
-    RayTracer(int maxRecursionDepth = 5) : maxRecursionDepth(maxRecursionDepth) {}
+    RayTracer(int maxRecursionDepth = 5) : maxRecursionDepth(maxRecursionDepth), pixelsProcessed(0) {}
 
     void trace(const Scene& scene, Film& film) {
         Sampler sampler;
         int totalPixels = scene.width * scene.height;
-        int pixelsProcessed = 0;
         int progressWidth = 50; // Width of the progress bar in characters
+        const int progressBarUpdateFrequency = 100; // Update every 100 pixels
 
         auto startTime = std::chrono::high_resolution_clock::now();  // Record start time
 
@@ -29,34 +32,56 @@ public:
             maxRecursionDepth = scene.maxRecursionDepth;
         }
 
-        for (int y = 0; y < scene.height; y++) {
-            for (int x = 0; x < scene.width; x++) {
-                Vector3 sample = sampler.getSample(x, y);
-                Ray ray = scene.createRay(sample);
-                Intersection hit = scene.intersect(ray);
-                Vector3 color = findColor(ray, hit, scene);
-                film.addSample(x, y, color);
+        // Parallelization stuff
+        int numThreads = std::thread::hardware_concurrency(); // Get the number of available cores
+        std::vector<std::thread> threads(numThreads);
 
-                // Update progress bar
-                pixelsProcessed++;
-                int progress = (pixelsProcessed * progressWidth) / totalPixels;
+        int rowsPerThread = scene.height / numThreads;
 
-                auto currentTime = std::chrono::high_resolution_clock::now();
-                auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-                float timePerPixel = elapsedTime / static_cast<float>(pixelsProcessed);
-                float estimatedRemainingTime = timePerPixel * (totalPixels - pixelsProcessed);
+        for (int i = 0; i < numThreads; i++) {
+            int startY = i * rowsPerThread;
+            int endY = (i == numThreads - 1) ? scene.height : startY + rowsPerThread;
 
-                std::cout << "\r[";
-                for (int i = 0; i < progressWidth; i++) {
-                    if (i < progress) {
-                        std::cout << "=";
-                    } else {
-                        std::cout << " ";
+            threads[i] = std::thread([&, startY, endY]() {
+                for (int y = startY; y < endY; y++) {
+                    for (int x = 0; x < scene.width; x++) {
+                        Vector3 sample = sampler.getSample(x, y);
+                        Ray ray = scene.createRay(sample);
+                        Intersection hit = scene.intersect(ray);
+                        Vector3 color = findColor(ray, hit, scene);
+                        film.addSample(x, y, color);
+
+                        // Update progress bar
+                        pixelsProcessed.fetch_add(1);
+                        if (pixelsProcessed % progressBarUpdateFrequency == 0) {
+                            std::lock_guard<std::mutex> lock(progressMutex);
+                            int progress = (pixelsProcessed * progressWidth) / totalPixels;
+
+                            auto currentTime = std::chrono::high_resolution_clock::now();
+                            auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+                                    currentTime - startTime).count();
+                            float timePerPixel = elapsedTime / static_cast<float>(pixelsProcessed);
+                            float estimatedRemainingTime = timePerPixel * (totalPixels - pixelsProcessed);
+
+                            std::cout << "\r[";
+                            for (int i = 0; i < progressWidth; i++) {
+                                if (i < progress) {
+                                    std::cout << "=";
+                                } else {
+                                    std::cout << " ";
+                                }
+                            }
+                            std::cout << "] " << (100 * pixelsProcessed) / totalPixels
+                                      << "%, Estimated time remaining: " << estimatedRemainingTime << "s";
+                            std::cout.flush();
+                        }
                     }
                 }
-                std::cout << "] " << (100 * pixelsProcessed) / totalPixels << "%, Estimated time remaining: " << estimatedRemainingTime << "s";
-                std::cout.flush();
-            }
+            });
+        }
+
+        for (auto& thread : threads) {
+            thread.join(); // Wait for all threads to finish
         }
         std::cout << "\n";
     }
@@ -64,6 +89,8 @@ public:
 
 private:
     int maxRecursionDepth;
+    std::atomic<int> pixelsProcessed;
+    std::mutex progressMutex;
 
     Vector3 findColor(const Ray& ray, const Intersection& intersection, const Scene& scene, int depth = 0) {
         if (!intersection) return Vector3(0, 0, 0); // Return black if no intersection
