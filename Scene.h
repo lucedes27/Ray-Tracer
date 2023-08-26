@@ -107,11 +107,29 @@ public:
     }
 
     bool isShadowed(const Ray& shadowRay, const std::shared_ptr<Light>& light) const {
-        float distanceToLight = (light->position - shadowRay.origin).length();
+        float distanceToLight;
+        if (light->type == Light::Type::Directional) {
+            distanceToLight = std::numeric_limits<float>::infinity(); // Infinite distance for directional lights
+        } else {
+            distanceToLight = (light->position - shadowRay.origin).length(); // Finite distance for point lights
+        }
+
         for (const auto& object : objects) {
+            // Transform the shadow ray into the object's local space
+            Ray localShadowRay = shadowRay.transformedBy(object->getInverseTransform());
+
             float currentT = std::numeric_limits<float>::max();
-            if (object->intersect(shadowRay, currentT) && currentT < distanceToLight) {
-                return true; // There is an object between the point and the light
+            if (object->intersect(localShadowRay, currentT)) {
+                // Transform the intersection point back to world space
+                Vector3 localPoint = localShadowRay.origin + localShadowRay.direction * currentT;
+                Vector3 worldPoint = object->transform * localPoint;
+
+                // Compute the distance t in world space
+                float worldT = (worldPoint - shadowRay.origin).length();
+
+                if (worldT < distanceToLight) {
+                    return true; // There is an object between the point and the light
+                }
             }
         }
         return false; // No objects are blocking the light
@@ -165,7 +183,7 @@ public:
     }
 
     void setFovX() {
-        fovx = 2 * atan(tan(fovy / 2) * (float)width / (float)height);
+        fovx = 2 * atan(tan(fovy / 2) * ((float)width / (float)height));
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Scene& scene);
