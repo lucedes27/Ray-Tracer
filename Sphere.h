@@ -56,7 +56,13 @@ public:
     }
 
     Vector3 normalAt(const Vector3& point) const override {
-        return (point - center).normalize(); // Normal at a point on a sphere
+        // Calculate the normal in object space
+        Vector3 objectNormal = (point - center).normalize();
+
+        // Calculate the normal in world space
+        Vector3 worldNormal = transform.inverse().transpose() * objectNormal;
+
+        return worldNormal.normalize();
     }
 
     std::string toString() const override {
