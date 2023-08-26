@@ -98,6 +98,49 @@ void renderSphere() {
     film.writeImage("sphere.png");
 }
 
+void renderSphereWithDirectional() {
+    Vector3 eye(0, -4, 4);
+    Vector3 lookAt(0, 0, -2); // Center of the scene
+    Vector3 up(0, 1, 0); // Up vector
+    float fovy = 90; // Field of view in y direction
+    int width = 1000;
+    int height = 1000;
+
+    // Create the Scene object
+    Scene scene(eye, lookAt, up, fovy, width, height);
+
+    Material material(
+            Vector3(1.0, 0.0, 0.0), // Diffuse color (r, g, b) - Red
+            Vector3(1.0, 1.0, 1.0), // Specular color (r, g, b) - Shiny reflection
+            100.0,                 // Shininess - High shininess for a shiny surface
+            Vector3(0.0, 0.0, 0.0)  // Emission color (r, g, b)
+    );
+
+    // Create a shared pointer to a sphere and add it to the scene
+    std::shared_ptr<Shape> sphere = std::make_shared<Sphere>(Vector3(0, 0, -2), 1, material);
+    scene.addObject(sphere);
+
+    // Create a directional light and add it to the scene
+    Vector3 lightDirection(-1, -1, 0); // Direction of the light
+    Vector3 lightColor(1.0, 1.0, 1.0); // Color of the light (white)
+    std::shared_ptr<Light> directionalLight = std::make_shared<Light>(Light::Type::Directional, lightDirection, lightColor);
+    scene.addLight(directionalLight);
+
+    std::cout << scene << std::endl;
+
+    // Create a film object to store the rendered image
+    Film film(width, height);
+
+    // Create a ray tracer object
+    RayTracer rayTracer;
+
+    // Render the scene using the ray tracer
+    rayTracer.trace(scene, film);
+
+    // Save the rendered image to a file
+    film.writeImage("sphereWithDirectionalLight.png");
+}
+
 void renderTriangle() {
     Vector3 eye(0, 0, 0);
     Vector3 lookAt(0, 0, -1); // Center of the scene
@@ -690,6 +733,8 @@ int main() {
 //     renderBSOD();
 //
 //     renderSphere();
+
+//    renderSphereWithDirectional();
 //
 //     renderTriangle();
 //
@@ -725,7 +770,7 @@ int main() {
 
     std::cout << myScene << std::endl;
 
-    RayTracer rayTracer = RayTracer();
+    RayTracer rayTracer;
     rayTracer.trace(myScene, film);
 
     film.writeImage(parser.getOutputFilename());
